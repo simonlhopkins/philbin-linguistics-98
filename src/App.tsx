@@ -3,6 +3,7 @@ import "98.css";
 import Flashcards from "./Flashcards/Flashcards.tsx";
 import { Route, Routes, useLocation } from "react-router";
 import DescriptionChallenge from "./DescriptionChallenge/DescriptionChallenge.tsx";
+import Home from "./Home.tsx";
 
 function App() {
   let location = useLocation();
@@ -10,6 +11,9 @@ function App() {
     <>
       <div className="window-body flex-1 flex flex-col w-4xl max-w-full">
         <menu role="tablist">
+          <li role="tab" aria-selected={location.pathname == "/"}>
+            <a href="/">Home</a>
+          </li>
           <li role="tab" aria-selected={location.pathname == "/flashcards"}>
             <a href="/flashcards">
               <img
@@ -33,6 +37,7 @@ function App() {
         <div className="window flex-1" role="tabpanel">
           <div className="window-body">
             <Routes>
+              <Route index element={<Home />} />
               <Route path="/flashcards" element={<Flashcards />} />
               <Route path="/writing" element={<p>coming soon</p>} />
               <Route path="/stats" element={<p>coming soon</p>} />
