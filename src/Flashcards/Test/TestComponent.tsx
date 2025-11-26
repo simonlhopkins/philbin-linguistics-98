@@ -78,7 +78,7 @@ export default function TestComponent({ currentTestData }: Props) {
               className={clsx(
                 "window-body transform-3d flex-1",
                 currentTestStep.responseStatus == ResponseStatus.CORRECT &&
-                  "text-green-500",
+                  "text-green-600",
                 currentTestStep.responseStatus == ResponseStatus.INCORRECT &&
                   "text-red-500"
               )}
