@@ -1,6 +1,9 @@
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import type { FlashCardData } from "./Flashcards.tsx";
+import {
+  GetPhraseFromFlashCardData,
+  type FlashCardData,
+} from "./Flashcards.tsx";
 import { SetHelpers } from "../SetHelpers.ts";
 import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
 import { flashcardSlice } from "../Redux/flashcardSlice.ts";
@@ -26,7 +29,11 @@ export default function Study({ onRefreshClicked }: Props) {
     arr.sort((a, b) => {
       switch (sortMethod) {
         case SortMethod.PHRASE:
-          return a.phrase.localeCompare(b.phrase) * dir;
+          return (
+            GetPhraseFromFlashCardData(a).localeCompare(
+              GetPhraseFromFlashCardData(b)
+            ) * dir
+          );
 
         case SortMethod.MEANING:
           return a.meaning.localeCompare(b.meaning) * dir;
@@ -139,7 +146,7 @@ export default function Study({ onRefreshClicked }: Props) {
                 }}
                 onMouseUp={() => setIsDragging(false)}
               >
-                <td>{row.phrase}</td>
+                <td>{GetPhraseFromFlashCardData(row)}</td>
                 <td>{row.meaning}</td>
                 <td>{row.flavorText}</td>
                 <td>{new Date(row.dateLearned).toLocaleDateString()}</td>
@@ -185,7 +192,9 @@ export default function Study({ onRefreshClicked }: Props) {
         </button>
         <button
           onClick={() => {
-            dispatch(flashcardSlice.actions.SetTestToCurrentlySelectedCards());
+            dispatch(
+              flashcardSlice.actions.SetTestToCurrentlySelectedCardsAndStart()
+            );
           }}
           disabled={selectedCards.length == 0}
         >
@@ -202,7 +211,14 @@ export default function Study({ onRefreshClicked }: Props) {
             dispatch(flashcardSlice.actions.ResumeTest());
           }}
         >
-          Resume
+          {`Resume (${
+            currentTestData &&
+            (
+              ((currentTestData.currentStep + 1) /
+                currentTestData.testSteps.length) *
+              100
+            ).toFixed(0)
+          }%)`}
         </button>
       </div>
     </div>

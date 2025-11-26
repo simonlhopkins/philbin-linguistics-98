@@ -4,11 +4,13 @@ import OpenAIClient from "./OpenAIClient";
 interface Props {
   onTranscription(transcription: string): void;
   currentResponse: string | null;
+  disabled: boolean;
 }
 
 export default function SpeechButton({
   onTranscription,
   currentResponse,
+  disabled,
 }: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const [volume, setVolume] = useState(0);
@@ -23,7 +25,14 @@ export default function SpeechButton({
     // Clamp to valid 0–1 range
     const v = Math.min(1, Math.max(0, volume));
 
-    const levels = [".", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
+    const levels = [
+      "░░░░░░░",
+      "░░░▒░░░",
+      "░░▒▓▒░░",
+      "░▒▓▓▓▒░",
+      "▒▓▓▓▓▓▒",
+      "▓▓▓▓▓▓▓",
+    ];
     // Convert 0–1 to 0–8 index
     const index = Math.round(v * (levels.length - 1));
 
@@ -34,7 +43,7 @@ export default function SpeechButton({
       <legend>Record Answer {volumeToAscii(volume * 10)}</legend>
       <div className="field-row">
         <button
-          disabled={isRecording || isLoading}
+          disabled={isRecording || isLoading || disabled}
           onClick={async () => {
             const stream = await navigator.mediaDevices.getUserMedia({
               audio: true,
@@ -101,7 +110,7 @@ export default function SpeechButton({
               mediaRecorder.current = null;
             }
           }}
-          disabled={!isRecording || isLoading}
+          disabled={!isRecording || isLoading || disabled}
         >
           Stop Recording Speech
         </button>

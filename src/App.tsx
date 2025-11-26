@@ -8,10 +8,17 @@ function App() {
   let location = useLocation();
   return (
     <>
-      <div className="window-body flex-1 flex flex-col">
+      <div className="window-body flex-1 flex flex-col w-4xl max-w-full">
         <menu role="tablist">
           <li role="tab" aria-selected={location.pathname == "/flashcards"}>
-            <a href="/flashcards">Flashcards</a>
+            <a href="/flashcards">
+              <img
+                src="/directory_closed-3.png"
+                alt=""
+                className="h-5 inline-block mr-2"
+              />
+              Flashcards
+            </a>
           </li>
           <li role="tab" aria-selected={location.pathname == "/writing"}>
             <a href="/writing">Writing</a>
@@ -27,7 +34,9 @@ function App() {
           <div className="window-body">
             <Routes>
               <Route path="/flashcards" element={<Flashcards />} />
-              <Route path="/writing" element={<DescriptionChallenge />} />
+              <Route path="/writing" element={<p>coming soon</p>} />
+              <Route path="/stats" element={<p>coming soon</p>} />
+              <Route path="/daily" element={<p>coming soon</p>} />
               <Route path="*" element={<p>not found</p>} />
             </Routes>
           </div>

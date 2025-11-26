@@ -12,6 +12,10 @@ export const flashcardSlice = createSlice({
   reducers: {
     SetLoadedCards: (state, action: PayloadAction<FlashCardData[]>) => {
       state.loadedCards = action.payload;
+      const loadedCardIds = action.payload.map((loadedCard) => loadedCard.id);
+      state.selectedCards = state.selectedCards.filter((cardId) =>
+        loadedCardIds.includes(cardId)
+      );
     },
     AddCardToSelection: (state, action: PayloadAction<number>) => {
       state.selectedCards = Array.from(
@@ -37,21 +41,26 @@ export const flashcardSlice = createSlice({
         new Set(state.loadedCards.map((card) => card.id))
       );
     },
-    SetTestToCurrentlySelectedCards: (state) => {
-      const testSteps: TestStep[] = state.selectedCards.map((cardId) => ({
-        cardId,
-        spokenAnswer: null,
-        writtenAnswer: null,
-        alreadySeen: false,
-        faceShowing: Face.QUESTION,
-        responseStatus: ResponseStatus.UNKNOWN,
-      }));
+    SetTestToCurrentlySelectedCardsAndStart: (state) => {
+      const testSteps: TestStep[] = state.selectedCards
+        .filter(
+          (cardId) => state.loadedCards.map((card) => card.id).includes(cardId) //bug where if you delete a card, it will never leave your selection
+        )
+        .map((cardId) => ({
+          cardId,
+          spokenAnswer: null,
+          writtenAnswer: null,
+          alreadySeen: false,
+          faceShowing: Face.QUESTION,
+          responseStatus: ResponseStatus.UNKNOWN,
+        }));
 
       state.currentTestData = {
         currentStep: 0,
         testSteps: shuffle(testSteps),
         status: TestStatus.PROGRESS,
         invertFaces: false,
+        showKanji: false,
       };
     },
 
@@ -77,6 +86,7 @@ export const flashcardSlice = createSlice({
           state.currentTestData.currentStep + 1,
           state.currentTestData.testSteps.length - 1
         );
+        console.log(state.currentTestData.testSteps[newStep].cardId);
         state.currentTestData = {
           ...state.currentTestData,
           currentStep: newStep,
@@ -247,7 +257,18 @@ export const flashcardSlice = createSlice({
     },
     SetInvertFaces(state, action: PayloadAction<boolean>) {
       if (state.currentTestData) {
-        state.currentTestData.invertFaces = action.payload;
+        state.currentTestData = {
+          ...state.currentTestData,
+          invertFaces: action.payload,
+        };
+      }
+    },
+    SetShowKanji(state, action: PayloadAction<boolean>) {
+      if (state.currentTestData) {
+        state.currentTestData = {
+          ...state.currentTestData,
+          showKanji: action.payload,
+        };
       }
     },
   },
@@ -267,6 +288,7 @@ export interface TestData {
   testSteps: TestStep[];
   status: TestStatus;
   invertFaces: boolean;
+  showKanji: boolean;
 }
 
 export enum TestStatus {

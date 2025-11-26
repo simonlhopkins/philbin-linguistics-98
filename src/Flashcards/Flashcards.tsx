@@ -1,8 +1,7 @@
 import PublicGoogleSheetsParser from "public-google-sheets-parser";
 import { useEffect, useRef, useState } from "react";
-import clsx from "clsx";
 import Study from "./Study.tsx";
-import TestComponent from "./TestComponent.tsx";
+import TestComponent from "./Test/TestComponent.tsx";
 import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
 import { flashcardSlice, TestStatus } from "../Redux/flashcardSlice.ts";
 import TestResults from "./TestResults.tsx";
@@ -10,13 +9,7 @@ import TestResults from "./TestResults.tsx";
 export default function Flashcards() {
   // const [selectedMode, setSelectedMode] = useState<MODE>(MODE.STUDY);
 
-  const { loadedCards, currentTestData } = useAppSelector(
-    (state) => state.flashcard
-  );
-
-  const showStudyUI =
-    currentTestData == null ||
-    (currentTestData && currentTestData.status == TestStatus.ABANDONED);
+  const { currentTestData } = useAppSelector((state) => state.flashcard);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -31,12 +24,13 @@ export default function Flashcards() {
 
     parser.parse().then((data: GoogleSheetRow[]) => {
       const flashcardData = data
-        .filter((row) => row["phrase/word"] != undefined)
+        .filter((row) => row["hiragana/katakana"] != undefined)
         .map(
           (row, index) =>
             ({
               id: row["id"],
-              phrase: row["phrase/word"],
+              kana: row["hiragana/katakana"],
+              kanji: row["kanji"],
               meaning: row["meaning"],
               flavorText: row["flavor text"],
               dateLearned: row["date learned"],
@@ -80,14 +74,22 @@ enum MODE {
 }
 export interface FlashCardData {
   id: number;
-  phrase: string;
+  kana: string;
+  kanji: string | null;
   meaning: string;
   flavorText: string;
   dateLearned: string;
 }
 
+export function GetPhraseFromFlashCardData(flashcardData: FlashCardData) {
+  return flashcardData.kanji
+    ? `${flashcardData.kanji} (${flashcardData.kana})`
+    : `${flashcardData.kana}`;
+}
+
 interface GoogleSheetRow {
-  "phrase/word": string;
+  "hiragana/katakana": string;
+  kanji: string | undefined;
   meaning: string;
   "flavor text": string;
   "date learned": string;
