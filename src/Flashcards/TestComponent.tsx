@@ -1,18 +1,13 @@
-import type { FlashCardData } from "./Flashcards.tsx";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { SetHelpers } from "../SetHelpers.ts";
+import { useEffect, useRef } from "react";
 import clsx from "clsx";
 import "canvas-confetti";
-import type { RootState } from "../Redux/store.ts";
 import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
 import {
   Face,
   flashcardSlice,
-  ResponseStatus,
-  TestStatus,
   type TestData,
 } from "../Redux/flashcardSlice.ts";
-import TestResults from "./TestResults.tsx";
+import SpeechButton from "./SpeechButton.tsx";
 
 interface Props {
   currentTestData: TestData;
@@ -56,7 +51,10 @@ export default function TestComponent({ currentTestData }: Props) {
               }}
               className={clsx(
                 "window transform-3d w-80 h-48 perspective-midrange flex flex-col",
-                currentTestStep.faceShowing == Face.SOLUTION && "rotate-y-180",
+                currentTestStep.faceShowing ==
+                  (currentTestData.invertFaces
+                    ? Face.SOLUTION
+                    : Face.QUESTION) && "rotate-y-180",
                 cardIdBeforeClickRef.current &&
                   cardIdBeforeClickRef!.current == currentFlashCardData.id &&
                   "transition-transform duration-500"
@@ -158,7 +156,7 @@ export default function TestComponent({ currentTestData }: Props) {
             </div>
           </div>
         </div>
-        <div>
+        <div className="flex flex-col gap-3">
           <button
             onClick={() => {
               dispatch(flashcardSlice.actions.AbandonTest());
@@ -166,6 +164,30 @@ export default function TestComponent({ currentTestData }: Props) {
           >
             Exit
           </button>
+          <SpeechButton
+            onTranscription={function (transcription: string): void {
+              dispatch(
+                flashcardSlice.actions.SetSpokenAnswer({
+                  cardNum: currentTestStep.cardId,
+                  answer: transcription,
+                })
+              );
+            }}
+            currentResponse={currentTestStep.spokenAnswer}
+          />
+          <>
+            <input
+              type="checkbox"
+              id="example1"
+              checked={currentTestData.invertFaces}
+              onChange={(e) => {
+                dispatch(
+                  flashcardSlice.actions.SetInvertFaces(e.target.checked)
+                );
+              }}
+            />
+            <label htmlFor="example1">Invert Faces</label>
+          </>
         </div>
       </div>
 

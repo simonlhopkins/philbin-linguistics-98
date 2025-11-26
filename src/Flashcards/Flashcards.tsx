@@ -65,7 +65,6 @@ export default function Flashcards() {
 
   return (
     <div>
-      <h1>Flashcards</h1>
       <div className="window-body flex-1 flex flex-col">
         <div className="window">
           <div className="window-body">{GetRenderedBody()}</div>

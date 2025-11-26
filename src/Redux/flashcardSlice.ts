@@ -51,6 +51,7 @@ export const flashcardSlice = createSlice({
         currentStep: 0,
         testSteps: shuffle(testSteps),
         status: TestStatus.PROGRESS,
+        invertFaces: false,
       };
     },
 
@@ -83,7 +84,10 @@ export const flashcardSlice = createSlice({
             i == newStep
               ? {
                   ...step,
-                  faceShowing: Face.QUESTION,
+                  faceShowing:
+                    newStep == state.currentTestData!.testSteps.length - 1
+                      ? step.faceShowing
+                      : Face.QUESTION,
                 }
               : step
           ),
@@ -156,6 +160,24 @@ export const flashcardSlice = createSlice({
         };
       }
     },
+    SetSpokenAnswer: (
+      state,
+      action: PayloadAction<{ cardNum: number; answer: string }>
+    ) => {
+      if (state.currentTestData) {
+        state.currentTestData = {
+          ...state.currentTestData,
+          testSteps: state.currentTestData.testSteps.map((step) =>
+            step.cardId == action.payload.cardNum
+              ? {
+                  ...step,
+                  spokenAnswer: action.payload.answer,
+                }
+              : step
+          ),
+        };
+      }
+    },
 
     AbandonTest: (state) => {
       if (state.currentTestData) {
@@ -212,7 +234,6 @@ export const flashcardSlice = createSlice({
             spokenAnswer: null,
             writtenAnswer: null,
           }));
-        state.selectedCards = newTestSteps.map((step) => step.cardId);
         state.currentTestData = {
           ...state.currentTestData,
           currentStep: 0,
@@ -223,6 +244,11 @@ export const flashcardSlice = createSlice({
     },
     ExitTest: (state) => {
       state.currentTestData = null;
+    },
+    SetInvertFaces(state, action: PayloadAction<boolean>) {
+      if (state.currentTestData) {
+        state.currentTestData.invertFaces = action.payload;
+      }
     },
   },
 });
@@ -240,6 +266,7 @@ export interface TestData {
   currentStep: number;
   testSteps: TestStep[];
   status: TestStatus;
+  invertFaces: boolean;
 }
 
 export enum TestStatus {

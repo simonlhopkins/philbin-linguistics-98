@@ -23,7 +23,7 @@ function App() {
             <a href="/daily">Daily Game</a>
           </li>
         </menu>
-        <div className="window" role="tabpanel">
+        <div className="window flex-1" role="tabpanel">
           <div className="window-body">
             <Routes>
               <Route path="/flashcards" element={<Flashcards />} />
