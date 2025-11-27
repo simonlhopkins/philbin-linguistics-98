@@ -7,7 +7,12 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-image: url("/dolphins.gif");
 }
 li[role="tab"] {
   background-color: rgb(192, 192, 192);
+}
+
+.dolphinsBackground {
+  background-image: url("/dolphins.gif");
 }

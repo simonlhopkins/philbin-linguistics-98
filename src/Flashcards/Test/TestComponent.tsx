@@ -66,7 +66,7 @@ export default function TestComponent({ currentTestData }: Props) {
               dispatch(flashcardSlice.actions.FlipCard(currentTestStep.cardId));
             }}
             className={clsx(
-              "window transform-3d w-96 aspect-video max-w-full perspective-midrange flex flex-col",
+              "window transform-3d w-96 aspect-video max-w-full perspective-midrange flex flex-col ",
               currentTestStep.faceShowing ==
                 (currentTestData.invertFaces ? Face.SOLUTION : Face.QUESTION) &&
                 "rotate-y-180",
