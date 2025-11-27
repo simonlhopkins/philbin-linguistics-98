@@ -1,18 +1,22 @@
-import { flashcardSlice, ResponseStatus } from "../Redux/flashcardSlice";
-import { useAppDispatch, useAppSelector } from "../Redux/hooks";
+import {
+  flashcardSlice,
+  ResponseStatus,
+  type TestData,
+} from "../Redux/flashcardSlice";
+import { useAppDispatch } from "../Redux/hooks";
 
-export default function TestResults() {
-  const { currentTestData } = useAppSelector((state) => state.flashcard);
+interface Props {
+  currentTestData: TestData;
+}
+export default function TestResults({ currentTestData }: Props) {
   const dispatch = useAppDispatch();
-  if (!currentTestData) {
-    return <p>no test data</p>;
-  }
+
   return (
     <div className="window-body flex-1 flex flex-col max-w-80">
       <div className="window">
         <div className="window-body flex-1 flex flex-col gap-2">
           <h1>Results!</h1>
-          <table className="interactive">
+          <table>
             <tbody>
               <tr>
                 <td>Correct</td>

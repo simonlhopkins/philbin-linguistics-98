@@ -65,8 +65,8 @@ export default function Study({ onRefreshClicked }: Props) {
   }
 
   return (
-    <div className={"flex flex-wrap gap-2"}>
-      <div className="sunken-panel inline-block h-96">
+    <div className={"flex gap-2 flex-wrap"}>
+      <div className="sunken-panel inline-block h-96 max-w-xl">
         <table className={clsx("interactive")}>
           <thead>
             <tr>
@@ -173,6 +173,7 @@ export default function Study({ onRefreshClicked }: Props) {
         <button
           onClick={() => {
             console.log("todo...");
+            dispatch(flashcardSlice.actions.SelectDaily());
           }}
         >
           <img
@@ -180,7 +181,7 @@ export default function Study({ onRefreshClicked }: Props) {
             alt=""
             className="h-4 inline-block mr-2"
           />
-          Random 20
+          Daily Challenge
         </button>
         <button onClick={onRefreshClicked}>
           <img

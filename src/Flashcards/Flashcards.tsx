@@ -49,7 +49,7 @@ export default function Flashcards() {
       case TestStatus.ABANDONED:
         return <Study onRefreshClicked={RefreshItems} />;
       case TestStatus.FINISHED:
-        return <TestResults />;
+        return <TestResults currentTestData={currentTestData} />;
       case TestStatus.PROGRESS:
         return <TestComponent currentTestData={currentTestData} />;
       default:

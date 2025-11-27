@@ -10,6 +10,9 @@ function App() {
   return (
     <>
       <div className="window-body flex-1 flex flex-col w-4xl max-w-full">
+        <a href="https://www.pornhub.com/">
+          <img src="/links_to_firey_sites.gif" alt="" className="mb-2 w-full" />
+        </a>
         <menu role="tablist">
           <li role="tab" aria-selected={location.pathname == "/"}>
             <a href="/">Home</a>
