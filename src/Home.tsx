@@ -6,6 +6,7 @@ export default function Home() {
         The Most <b>Advanced</b> Language Learning Platform
       </h3>
       <img src="/claudio_blm.jpg" alt="" className="h-80" />
+      <a href="/flashcards">Start Studying</a>
     </div>
   );
 }

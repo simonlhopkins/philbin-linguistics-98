@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import OpenAIClient from "./OpenAIClient";
+import { permission } from "process";
 
 interface Props {
   onTranscription(transcription: string): void;
@@ -20,6 +21,14 @@ export default function SpeechButton({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
   const rafIdRef = useRef<number | null>(null);
+  const [currentMediaDeviceInfo, setCurrentMediaDeviceInfo] = useState<
+    MediaDeviceInfo[]
+  >([]);
+  const [selectedMediaDeviceId, setSelectedMediaDeviceId] = useState<
+    string | null
+  >(null);
+  const [recordingPermission, setRecordingPermission] =
+    useState<PermissionState | null>(null);
 
   function volumeToAscii(volume: number): string {
     // Clamp to valid 0–1 range
@@ -35,24 +44,98 @@ export default function SpeechButton({
     ];
     // Convert 0–1 to 0–8 index
     const index = Math.round(v * (levels.length - 1));
-
     return levels[index];
   }
+
+  useEffect(() => {
+    const updateDevices = () => {
+      console.log("device change...");
+      navigator.mediaDevices
+        .enumerateDevices()
+        .then((devices) => {
+          const filtered = devices
+            .reduce((acc: MediaDeviceInfo[], item) => {
+              if (!acc.some((obj) => obj.deviceId === item.deviceId)) {
+                acc.push(item);
+              }
+              return acc;
+            }, [])
+            .filter((device) => device.kind === "audioinput");
+
+          if (selectedMediaDeviceId == null) {
+            setSelectedMediaDeviceId(filtered[0].deviceId);
+          }
+          setCurrentMediaDeviceInfo(filtered);
+        })
+        .catch((err) => {
+          console.error(`${err.name}: ${err.message}`);
+        });
+    };
+
+    // Initial load
+    updateDevices();
+
+    // Listen for device or permission changes
+    navigator.mediaDevices.addEventListener("devicechange", updateDevices);
+
+    try {
+      navigator.permissions.query({ name: "microphone" }).then((permission) => {
+        permission.onchange = () => {
+          console.log(permission.state);
+          setRecordingPermission(permission.state);
+          updateDevices();
+        };
+        setRecordingPermission(permission.state);
+      });
+
+      // granted, denied, prompt
+    } catch (err) {
+      // Handle the error
+    }
+
+    return () =>
+      navigator.mediaDevices.removeEventListener("devicechange", updateDevices);
+  }, []);
   return (
     <fieldset className="border-2">
       <legend>Record Answer {volumeToAscii(volume * 10)}</legend>
+      <select
+        className="mb-2"
+        value={selectedMediaDeviceId || "default"}
+        onChange={(e) => {
+          setSelectedMediaDeviceId(e.target.value);
+          console.log(e.target.value);
+        }}
+      >
+        {currentMediaDeviceInfo.map((mediaDevice) => (
+          <option value={mediaDevice.deviceId} key={mediaDevice.deviceId}>
+            {mediaDevice.label}
+          </option>
+        ))}
+      </select>
+
       <div className="field-row">
         <button
-          disabled={isRecording || isLoading || disabled}
+          disabled={
+            isRecording ||
+            isLoading ||
+            disabled ||
+            selectedMediaDeviceId == null
+          }
           onClick={async () => {
+            if (selectedMediaDeviceId == null) {
+              console.error("no media device selected");
+              return;
+            }
             const stream = await navigator.mediaDevices.getUserMedia({
-              audio: true,
+              audio: {
+                deviceId: selectedMediaDeviceId,
+              },
             });
             mediaRecorder.current = new MediaRecorder(stream);
             audioContextRef.current = new (window.AudioContext ||
               (window as any).webkitAudioContext)();
             await audioContextRef.current.resume();
-            console.log(stream);
             const source =
               audioContextRef.current.createMediaStreamSource(stream);
 
@@ -91,10 +174,11 @@ export default function SpeechButton({
               const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
               setIsRecording(false);
               setIsLoading(true);
-              const response = await OpenAIClient.TranscribeAudioBlob(
-                audioBlob
-              );
-              onTranscription(response.text);
+              setVolume(0);
+              // const response = await OpenAIClient.TranscribeAudioBlob(
+              //   audioBlob
+              // );
+              // onTranscription(response.text);
               setIsLoading(false);
             };
           }}

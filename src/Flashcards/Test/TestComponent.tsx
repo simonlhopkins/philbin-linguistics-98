@@ -53,20 +53,19 @@ export default function TestComponent({ currentTestData }: Props) {
   }, [currentTestData.currentStep]);
 
   return (
-    <div className={"flex flex-col gap-2 items-center"}>
+    <div className={"flex flex-col gap-2"}>
       <div className="flex flex-row gap-2 flex-wrap max-w-full">
         <div
           className={
-            "inline-flex flex-col items-start max-w-full gap-2 justify-center"
+            "flex flex-col min-w-full sm:min-w-90 max-w-full gap-2 flex-1"
           }
         >
           <div
             onClick={() => {
-              console.log("flip card");
               dispatch(flashcardSlice.actions.FlipCard(currentTestStep.cardId));
             }}
             className={clsx(
-              "window transform-3d w-96 aspect-video max-w-full perspective-midrange flex flex-col ",
+              "window transform-3d w-full aspect-video max-w-full perspective-midrange flex flex-col",
               currentTestStep.faceShowing ==
                 (currentTestData.invertFaces ? Face.SOLUTION : Face.QUESTION) &&
                 "rotate-y-180",
