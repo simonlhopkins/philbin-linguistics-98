@@ -68,10 +68,6 @@ export default function Flashcards() {
   );
 }
 
-enum MODE {
-  STUDY = 0,
-  TEST = 1,
-}
 export interface FlashCardData {
   id: number;
   kana: string;
