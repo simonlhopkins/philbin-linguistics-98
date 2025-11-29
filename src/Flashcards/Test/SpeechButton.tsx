@@ -175,10 +175,10 @@ export default function SpeechButton({
               setIsRecording(false);
               setIsLoading(true);
               setVolume(0);
-              // const response = await OpenAIClient.TranscribeAudioBlob(
-              //   audioBlob
-              // );
-              // onTranscription(response.text);
+              const response = await OpenAIClient.TranscribeAudioBlob(
+                audioBlob
+              );
+              onTranscription(response.text);
               setIsLoading(false);
             };
           }}
