@@ -1,9 +1,9 @@
 import PublicGoogleSheetsParser from "public-google-sheets-parser";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
+import { flashcardSlice, TestStatus } from "../Redux/flashcardSlice.ts";
+import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
 import Study from "./Study.tsx";
 import TestComponent from "./Test/TestComponent.tsx";
-import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
-import { flashcardSlice, TestStatus } from "../Redux/flashcardSlice.ts";
 import TestResults from "./TestResults.tsx";
 
 export default function Flashcards() {
@@ -24,13 +24,12 @@ export default function Flashcards() {
 
     parser.parse().then((data: GoogleSheetRow[]) => {
       const flashcardData = data
-        .filter((row) => row["hiragana/katakana"] != undefined)
+        .filter((row) => row["japanese text"] != undefined)
         .map(
           (row, index) =>
             ({
               id: row["id"],
-              kana: row["hiragana/katakana"],
-              kanji: row["kanji"],
+              japaneseText: row["japanese text"],
               meaning: row["meaning"],
               flavorText: row["flavor text"],
               dateLearned: row["date learned"],
@@ -70,22 +69,14 @@ export default function Flashcards() {
 
 export interface FlashCardData {
   id: number;
-  kana: string;
-  kanji: string | null;
+  japaneseText: string;
   meaning: string;
   flavorText: string;
   dateLearned: string;
 }
 
-export function GetPhraseFromFlashCardData(flashcardData: FlashCardData) {
-  return flashcardData.kanji
-    ? `${flashcardData.kanji} (${flashcardData.kana})`
-    : `${flashcardData.kana}`;
-}
-
 interface GoogleSheetRow {
-  "hiragana/katakana": string;
-  kanji: string | undefined;
+  "japanese text": string;
   meaning: string;
   "flavor text": string;
   "date learned": string;

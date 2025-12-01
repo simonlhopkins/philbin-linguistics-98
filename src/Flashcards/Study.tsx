@@ -1,12 +1,8 @@
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import {
-  GetPhraseFromFlashCardData,
-  type FlashCardData,
-} from "./Flashcards.tsx";
-import { SetHelpers } from "../SetHelpers.ts";
-import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
 import { flashcardSlice } from "../Redux/flashcardSlice.ts";
+import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
+import TextHelpers from "../TextHelpers.ts";
 
 interface Props {
   onRefreshClicked: () => void;
@@ -30,8 +26,8 @@ export default function Study({ onRefreshClicked }: Props) {
       switch (sortMethod) {
         case SortMethod.PHRASE:
           return (
-            GetPhraseFromFlashCardData(a).localeCompare(
-              GetPhraseFromFlashCardData(b)
+            TextHelpers.GetTextAsKanji(a.japaneseText).localeCompare(
+              TextHelpers.GetTextAsKanji(b.japaneseText)
             ) * dir
           );
 
@@ -146,7 +142,7 @@ export default function Study({ onRefreshClicked }: Props) {
                 }}
                 onMouseUp={() => setIsDragging(false)}
               >
-                <td>{GetPhraseFromFlashCardData(row)}</td>
+                <td>{row.japaneseText}</td>
                 <td>{row.meaning}</td>
                 <td>{row.flavorText}</td>
                 <td>{new Date(row.dateLearned).toLocaleDateString()}</td>
@@ -213,12 +209,13 @@ export default function Study({ onRefreshClicked }: Props) {
           }}
         >
           {`Resume (${
-            currentTestData &&
-            (
-              ((currentTestData.currentStep + 1) /
-                currentTestData.testSteps.length) *
-              100
-            ).toFixed(0)
+            (currentTestData &&
+              (
+                ((currentTestData.currentStep + 1) /
+                  currentTestData.testSteps.length) *
+                100
+              ).toFixed(0)) ||
+            0
           }%)`}
         </button>
       </div>

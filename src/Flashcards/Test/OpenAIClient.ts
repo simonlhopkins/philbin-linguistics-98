@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY as string;
+const apiKey = (import.meta.env.VITE_OPENAI_API_KEY as string) || "";
 class OpenAIClient {
   private static client = new OpenAI({
     apiKey,
@@ -18,17 +18,23 @@ class OpenAIClient {
 
   static async TranscribeAudioBlob(
     audioBlob: Blob
-  ): Promise<OpenAI.Audio.Transcriptions.Transcription> {
+  ): Promise<OpenAI.Audio.Transcriptions.Transcription | null> {
     const formData = new FormData();
     formData.append("file", audioBlob, "recording.webm");
     formData.append("model", "gpt-transcribe");
     formData.append("translate", "true"); // This forces JP → EN translation
-    const transcription = await this.client.audio.transcriptions.create({
-      file: new File([audioBlob], "audio.webm", { type: "audio/webm" }),
-      model: "gpt-4o-transcribe",
-      language: "ja",
-    });
-    return transcription;
+
+    try {
+      const transcription = await this.client.audio.transcriptions.create({
+        file: new File([audioBlob], "audio.webm", { type: "audio/webm" }),
+        model: "gpt-4o-transcribe",
+        language: "ja",
+      });
+      return transcription;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 }
 

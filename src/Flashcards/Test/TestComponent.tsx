@@ -1,19 +1,16 @@
-import { useEffect, useRef } from "react";
-import clsx from "clsx";
 import "canvas-confetti";
-import { useAppDispatch, useAppSelector } from "../../Redux/hooks.ts";
+import clsx from "clsx";
+import React, { useEffect, useRef, type ReactNode } from "react";
 import {
   Face,
   flashcardSlice,
   ResponseStatus,
   type TestData,
 } from "../../Redux/flashcardSlice.ts";
-import SpeechButton from "./SpeechButton.tsx";
+import { useAppDispatch, useAppSelector } from "../../Redux/hooks.ts";
+import TextHelpers from "../../TextHelpers.ts";
 import MissingCardText from "./MissingCardText.tsx";
-import {
-  GetPhraseFromFlashCardData,
-  type FlashCardData,
-} from "../Flashcards.tsx";
+import SpeechButton from "./SpeechButton.tsx";
 
 interface Props {
   currentTestData: TestData;
@@ -92,17 +89,19 @@ export default function TestComponent({ currentTestData }: Props) {
                     "transform-3d w-full h-full flex flex-col justify-center items-center"
                   }
                 >
-                  <h4 className={"backface-hidden"}>
+                  <h2 className={"backface-hidden"}>
                     {currentFlashCardData ? (
                       currentTestData.showKanji ? (
-                        GetPhraseFromFlashCardData(currentFlashCardData)
+                        GetFurigana(currentFlashCardData.japaneseText)
                       ) : (
-                        currentFlashCardData.kana
+                        TextHelpers.GetTextAsKana(
+                          currentFlashCardData.japaneseText
+                        )
                       )
                     ) : (
                       <MissingCardText cardId={currentTestStep.cardId} />
                     )}
-                  </h4>
+                  </h2>
                 </div>
               </div>
               <div className={"absolute transform-3d w-full h-full"}>
@@ -111,13 +110,13 @@ export default function TestComponent({ currentTestData }: Props) {
                     "transform-3d w-full h-full flex flex-col justify-center items-center"
                   }
                 >
-                  <h4 className={"rotate-y-180 backface-hidden"}>
+                  <h2 className={"rotate-y-180 backface-hidden"}>
                     {currentFlashCardData ? (
                       currentFlashCardData.meaning
                     ) : (
                       <MissingCardText cardId={currentTestStep.cardId} />
                     )}
-                  </h4>
+                  </h2>
                 </div>
               </div>
             </div>
@@ -246,5 +245,21 @@ export default function TestComponent({ currentTestData }: Props) {
         />
       </div>
     </div>
+  );
+}
+
+function GetFurigana(fullText: string): ReactNode {
+  return (
+    <ruby>
+      {fullText
+        .split("]")
+        .map((pairText) => pairText.split("["))
+        .map((pairArr, i) => (
+          <React.Fragment key={pairArr[0] + i}>
+            {pairArr[0]}
+            {pairArr.length > 0 && <rt>{pairArr[1]}</rt>}
+          </React.Fragment>
+        ))}
+    </ruby>
   );
 }

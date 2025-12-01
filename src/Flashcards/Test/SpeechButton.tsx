@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import OpenAIClient from "./OpenAIClient";
-import { permission } from "process";
 
 interface Props {
   onTranscription(transcription: string): void;
@@ -178,7 +177,9 @@ export default function SpeechButton({
               const response = await OpenAIClient.TranscribeAudioBlob(
                 audioBlob
               );
-              onTranscription(response.text);
+              if (response) {
+                onTranscription(response.text);
+              }
               setIsLoading(false);
             };
           }}
