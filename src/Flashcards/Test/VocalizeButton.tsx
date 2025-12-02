@@ -13,21 +13,19 @@ export default function VocalizeButton({ japaneseText }: Props) {
       disabled={loading}
       onClick={async () => {
         setLoading(true);
-        try {
-          const text = TextHelpers.GetTextAsKana(japaneseText);
-          const cachedValue = await IndexedDBClient.GetAudioBlob(text);
-          if (cachedValue != undefined) {
-            console.log("using cached value");
-            const url = URL.createObjectURL(cachedValue);
-            new Audio(url).play();
-          } else {
-            const audio = await OpenAIClient.fetchAudioBlob(text);
+        const text = TextHelpers.GetTextAsKana(japaneseText);
+        const cachedValue = await IndexedDBClient.GetAudioBlob(text);
+        if (cachedValue != undefined) {
+          console.log("using cached value");
+          const url = URL.createObjectURL(cachedValue);
+          new Audio(url).play();
+        } else {
+          const audio = await OpenAIClient.FetchAudioBlob(text);
+          if (audio) {
             await IndexedDBClient.SetAudioBlob(text, audio);
             const url = URL.createObjectURL(audio);
             await new Audio(url).play();
           }
-        } catch (e) {
-          setLoading(false);
         }
         setLoading(false);
       }}

@@ -82,6 +82,7 @@ export default function TestComponent({ currentTestData }: Props) {
                   "text-red-500"
               )}
             >
+              {/* Front */}
               <div className="flip-card-side flip-card-front">
                 <h2>
                   {currentFlashCardData ? (
@@ -97,7 +98,7 @@ export default function TestComponent({ currentTestData }: Props) {
                   )}
                 </h2>
               </div>
-
+              {/* Back */}
               <div className="flip-card-side flip-card-back">
                 <h2>
                   {currentFlashCardData ? (

@@ -19,14 +19,9 @@ class OpenAIClient {
   static async TranscribeAudioBlob(
     audioBlob: Blob
   ): Promise<OpenAI.Audio.Transcriptions.Transcription | null> {
-    const formData = new FormData();
-    formData.append("file", audioBlob, "recording.webm");
-    formData.append("model", "gpt-transcribe");
-    formData.append("translate", "true"); // This forces JP → EN translation
-
     try {
       const transcription = await this.client.audio.transcriptions.create({
-        file: new File([audioBlob], "audio.webm", { type: "audio/webm" }),
+        file: new File([audioBlob], "audio.m4a", { type: "audio/mp4" }),
         model: "gpt-4o-transcribe",
         language: "ja",
       });
@@ -37,15 +32,20 @@ class OpenAIClient {
     }
   }
 
-  static async fetchAudioBlob(text: string): Promise<Blob> {
-    const response = await this.client.audio.speech.create({
-      model: "gpt-4o-mini-tts",
-      voice: "alloy",
-      input: text,
-    });
+  static async FetchAudioBlob(text: string): Promise<Blob | null> {
+    try {
+      const response = await this.client.audio.speech.create({
+        model: "gpt-4o-mini-tts",
+        voice: "alloy",
+        input: text,
+      });
 
-    const arrayBuffer = await response.arrayBuffer();
-    return new Blob([arrayBuffer], { type: "audio/mpeg" });
+      const arrayBuffer = await response.arrayBuffer();
+      return new Blob([arrayBuffer], { type: "audio/mpeg" });
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   }
 }
 
