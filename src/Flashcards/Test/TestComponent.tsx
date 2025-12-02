@@ -14,6 +14,7 @@ import SpeechButton from "./SpeechButton.tsx";
 import OpenAIClient from "./OpenAIClient.ts";
 import { toast } from "sonner";
 import IndexedDBClient from "../../IndexedDBClient.ts";
+import VocalizeButton from "./VocalizeButton.tsx";
 
 interface Props {
   currentTestData: TestData;
@@ -213,26 +214,9 @@ export default function TestComponent({ currentTestData }: Props) {
             currentResponse={currentTestStep.spokenAnswer}
             disabled={currentFlashCardData == null}
           />
-          <button
-            onClick={async () => {
-              const text = TextHelpers.GetTextAsKana(
-                currentFlashCardData!.japaneseText
-              );
-              const cachedValue = await IndexedDBClient.GetAudioBlob(text);
-              if (cachedValue != undefined) {
-                console.log("using cached value");
-                const url = URL.createObjectURL(cachedValue);
-                new Audio(url).play();
-              } else {
-                const audio = await OpenAIClient.fetchAudioBlob(text);
-                await IndexedDBClient.SetAudioBlob(text, audio);
-                const url = URL.createObjectURL(audio);
-                await new Audio(url).play();
-              }
-            }}
-          >
-            speech
-          </button>
+          {currentFlashCardData && (
+            <VocalizeButton japaneseText={currentFlashCardData.japaneseText} />
+          )}
           <button
             onClick={() => {
               if (currentFlashCardData) {
