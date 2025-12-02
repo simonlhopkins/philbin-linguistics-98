@@ -103,7 +103,6 @@ export default function SpeechButton({
         value={selectedMediaDeviceId || "default"}
         onChange={(e) => {
           setSelectedMediaDeviceId(e.target.value);
-          console.log(e.target.value);
         }}
       >
         {currentMediaDeviceInfo.map((mediaDevice) => (

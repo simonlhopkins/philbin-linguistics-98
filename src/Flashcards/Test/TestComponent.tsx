@@ -13,6 +13,7 @@ import MissingCardText from "./MissingCardText.tsx";
 import SpeechButton from "./SpeechButton.tsx";
 import OpenAIClient from "./OpenAIClient.ts";
 import { toast } from "sonner";
+import IndexedDBClient from "../../IndexedDBClient.ts";
 
 interface Props {
   currentTestData: TestData;
@@ -217,9 +218,17 @@ export default function TestComponent({ currentTestData }: Props) {
               const text = TextHelpers.GetTextAsKana(
                 currentFlashCardData!.japaneseText
               );
-              const audio = await OpenAIClient.fetchAudioBlob(text);
-              const url = URL.createObjectURL(audio);
-              new Audio(url).play();
+              const cachedValue = await IndexedDBClient.GetAudioBlob(text);
+              if (cachedValue != undefined) {
+                console.log("using cached value");
+                const url = URL.createObjectURL(cachedValue);
+                new Audio(url).play();
+              } else {
+                const audio = await OpenAIClient.fetchAudioBlob(text);
+                await IndexedDBClient.SetAudioBlob(text, audio);
+                const url = URL.createObjectURL(audio);
+                await new Audio(url).play();
+              }
             }}
           >
             speech

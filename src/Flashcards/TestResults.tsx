@@ -12,10 +12,10 @@ export default function TestResults({ currentTestData }: Props) {
   const dispatch = useAppDispatch();
 
   return (
-    <div className="window-body flex-1 flex flex-col max-w-80">
+    <div className="window-body flex-1 flex gap-2 flex-wrap">
       <div className="window">
         <div className="window-body flex-1 flex flex-col gap-2">
-          <h1>Results!</h1>
+          <h3>Results!</h3>
           <table>
             <tbody>
               <tr>
@@ -83,6 +83,7 @@ export default function TestResults({ currentTestData }: Props) {
           </div>
         </div>
       </div>
+      <img src="/asuka_clapping.gif" alt="" />
     </div>
   );
 }
