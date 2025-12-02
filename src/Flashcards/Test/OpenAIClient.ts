@@ -36,6 +36,17 @@ class OpenAIClient {
       return null;
     }
   }
+
+  static async fetchAudioBlob(text: string): Promise<Blob> {
+    const response = await this.client.audio.speech.create({
+      model: "gpt-4o-mini-tts",
+      voice: "alloy",
+      input: text,
+    });
+
+    const arrayBuffer = await response.arrayBuffer();
+    return new Blob([arrayBuffer], { type: "audio/mpeg" });
+  }
 }
 
 export default OpenAIClient;

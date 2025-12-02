@@ -4,12 +4,14 @@ import Flashcards from "./Flashcards/Flashcards.tsx";
 import { Route, Routes, useLocation } from "react-router";
 import DescriptionChallenge from "./DescriptionChallenge/DescriptionChallenge.tsx";
 import Home from "./Home.tsx";
+import { Toaster } from "sonner";
 
 function App() {
   let location = useLocation();
   return (
     <>
       <div className="window-body flex-1 flex flex-col w-4xl max-w-full">
+        <Toaster />
         <a href="/">
           <img src="/links_to_firey_sites.gif" alt="" className="mb-2 w-full" />
         </a>

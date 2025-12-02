@@ -11,6 +11,8 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks.ts";
 import TextHelpers from "../../TextHelpers.ts";
 import MissingCardText from "./MissingCardText.tsx";
 import SpeechButton from "./SpeechButton.tsx";
+import OpenAIClient from "./OpenAIClient.ts";
+import { toast } from "sonner";
 
 interface Props {
   currentTestData: TestData;
@@ -64,8 +66,9 @@ export default function TestComponent({ currentTestData }: Props) {
             className={clsx(
               "window transform-3d w-full aspect-video max-w-full perspective-midrange flex flex-col",
               currentTestStep.faceShowing ==
-                (currentTestData.invertFaces ? Face.SOLUTION : Face.QUESTION) &&
-                "rotate-y-180",
+                (currentTestData.invertFaces
+                  ? Face.ENGLISH_TEXT
+                  : Face.JAPANESE_TEXT) && "rotate-y-180",
               cardIdBeforeClickRef.current == currentTestStep.cardId &&
                 "transition-transform duration-500"
             )}
@@ -209,6 +212,56 @@ export default function TestComponent({ currentTestData }: Props) {
             currentResponse={currentTestStep.spokenAnswer}
             disabled={currentFlashCardData == null}
           />
+          <button
+            onClick={async () => {
+              const text = TextHelpers.GetTextAsKana(
+                currentFlashCardData!.japaneseText
+              );
+              const audio = await OpenAIClient.fetchAudioBlob(text);
+              const url = URL.createObjectURL(audio);
+              new Audio(url).play();
+            }}
+          >
+            speech
+          </button>
+          <button
+            onClick={() => {
+              if (currentFlashCardData) {
+                navigator.clipboard.writeText(
+                  TextHelpers.GetTextAsKanji(currentFlashCardData.japaneseText)
+                );
+              }
+              toast.custom(
+                (id) => (
+                  <div className="window w-64">
+                    <div className="title-bar">
+                      <div className="title-bar-text">Message</div>
+                      <div className="title-bar-controls">
+                        <button
+                          onClick={() => {
+                            toast.dismiss(id);
+                          }}
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                    </div>
+                    <div className="window-body">
+                      <p>
+                        {`${TextHelpers.GetTextAsKanji(
+                          currentFlashCardData!.japaneseText
+                        )} Copied to clipboard`}
+                      </p>
+                    </div>
+                  </div>
+                ),
+                {
+                  closeButton: true,
+                }
+              );
+            }}
+          >
+            Copy Japanese Text to clipboard
+          </button>
           <div>
             <input
               type="checkbox"
@@ -251,15 +304,12 @@ export default function TestComponent({ currentTestData }: Props) {
 function GetFurigana(fullText: string): ReactNode {
   return (
     <ruby>
-      {fullText
-        .split("]")
-        .map((pairText) => pairText.split("["))
-        .map((pairArr, i) => (
-          <React.Fragment key={pairArr[0] + i}>
-            {pairArr[0]}
-            {pairArr.length > 0 && <rt>{pairArr[1]}</rt>}
-          </React.Fragment>
-        ))}
+      {TextHelpers.SplitAll(fullText).map((pairArr, i) => (
+        <React.Fragment key={pairArr[0] + i}>
+          {pairArr[0]}
+          {pairArr.length > 0 && <rt>{pairArr[1]}</rt>}
+        </React.Fragment>
+      ))}
     </ruby>
   );
 }

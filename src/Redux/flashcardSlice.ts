@@ -70,11 +70,14 @@ export const flashcardSlice = createSlice({
       const dateString = new Date().getDate().toLocaleString();
       const seed = xmur3(dateString)(); // Seed based on string
       const random = mulberry32(seed);
-      state.selectedCards = [];
+      const newCards = [];
       for (let i = 0; i < 5; i++) {
         var index = Math.floor(random() * state.loadedCards.length);
-        state.selectedCards.push(state.loadedCards[index].id);
+        newCards.push(state.loadedCards[index].id);
       }
+      state.selectedCards = Array.from(
+        SetHelpers.union(new Set(), new Set(newCards))
+      );
     },
     SetTestToCurrentlySelectedCardsAndStart: (state) => {
       const testSteps: TestStep[] = state.selectedCards
@@ -86,7 +89,7 @@ export const flashcardSlice = createSlice({
           spokenAnswer: null,
           writtenAnswer: null,
           alreadySeen: false,
-          faceShowing: Face.QUESTION,
+          faceShowing: Face.JAPANESE_TEXT,
           responseStatus: ResponseStatus.UNKNOWN,
         }));
 
@@ -132,7 +135,7 @@ export const flashcardSlice = createSlice({
                   faceShowing:
                     newStep == state.currentTestData!.testSteps.length - 1
                       ? step.faceShowing
-                      : Face.QUESTION,
+                      : Face.JAPANESE_TEXT,
                 }
               : step
           ),
@@ -150,7 +153,7 @@ export const flashcardSlice = createSlice({
             i == newStep
               ? {
                   ...step,
-                  faceShowing: Face.QUESTION,
+                  faceShowing: Face.JAPANESE_TEXT,
                 }
               : step
           ),
@@ -257,7 +260,7 @@ export const flashcardSlice = createSlice({
             state.currentTestData.testSteps.map((step) => ({
               ...step,
               alreadySeen: false,
-              faceShowing: Face.QUESTION,
+              faceShowing: Face.JAPANESE_TEXT,
               responseStatus: ResponseStatus.UNKNOWN,
               spokenAnswer: null,
               writtenAnswer: null,
@@ -274,7 +277,7 @@ export const flashcardSlice = createSlice({
           .map((step) => ({
             ...step,
             alreadySeen: false,
-            faceShowing: Face.QUESTION,
+            faceShowing: Face.JAPANESE_TEXT,
             responseStatus: ResponseStatus.UNKNOWN,
             spokenAnswer: null,
             writtenAnswer: null,
@@ -337,8 +340,8 @@ export enum ResponseStatus {
   INCORRECT = 2,
 }
 export enum Face {
-  QUESTION = 0,
-  SOLUTION = 1,
+  JAPANESE_TEXT = 0,
+  ENGLISH_TEXT = 1,
 }
 
 export default flashcardSlice.reducer;
