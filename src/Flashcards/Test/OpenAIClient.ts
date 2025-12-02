@@ -37,13 +37,14 @@ class OpenAIClient {
       const response = await this.client.audio.speech.create({
         model: "gpt-4o-mini-tts",
         voice: "alloy",
+        response_format: "mp3",
         input: text,
       });
 
       const arrayBuffer = await response.arrayBuffer();
       return new Blob([arrayBuffer], { type: "audio/mpeg" });
     } catch (e) {
-      console.error(e);
+      console.error("[FetchAudioBlob]", e);
       return null;
     }
   }
