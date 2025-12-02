@@ -12,7 +12,7 @@ function App() {
     <>
       <div className="window-body flex-1 flex flex-col w-4xl max-w-full">
         <Toaster />
-        <a href="/">
+        <a href="https://simonlhopkins.github.io/">
           <img src="/links_to_firey_sites.gif" alt="" className="mb-2 w-full" />
         </a>
         <menu role="tablist">
