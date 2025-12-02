@@ -1,6 +1,7 @@
 import "canvas-confetti";
 import clsx from "clsx";
 import React, { useEffect, useRef, type ReactNode } from "react";
+import { toast } from "sonner";
 import {
   Face,
   flashcardSlice,
@@ -11,9 +12,6 @@ import { useAppDispatch, useAppSelector } from "../../Redux/hooks.ts";
 import TextHelpers from "../../TextHelpers.ts";
 import MissingCardText from "./MissingCardText.tsx";
 import SpeechButton from "./SpeechButton.tsx";
-import OpenAIClient from "./OpenAIClient.ts";
-import { toast } from "sonner";
-import IndexedDBClient from "../../IndexedDBClient.ts";
 import VocalizeButton from "./VocalizeButton.tsx";
 
 interface Props {
@@ -77,52 +75,37 @@ export default function TestComponent({ currentTestData }: Props) {
           >
             <div
               className={clsx(
-                "window-body transform-3d flex-1",
+                "window-body flex-1 flip-card",
                 currentTestStep.responseStatus == ResponseStatus.CORRECT &&
                   "text-green-600",
                 currentTestStep.responseStatus == ResponseStatus.INCORRECT &&
                   "text-red-500"
               )}
             >
-              <div
-                className={
-                  "absolute transform-3d w-full h-full align-middle text-center"
-                }
-              >
-                <div
-                  className={
-                    "transform-3d w-full h-full flex flex-col justify-center items-center"
-                  }
-                >
-                  <h2 className={"backface-hidden"}>
-                    {currentFlashCardData ? (
-                      currentTestData.showKanji ? (
-                        GetFurigana(currentFlashCardData.japaneseText)
-                      ) : (
-                        TextHelpers.GetTextAsKana(
-                          currentFlashCardData.japaneseText
-                        )
+              <div className="flip-card-side flip-card-front">
+                <h2>
+                  {currentFlashCardData ? (
+                    currentTestData.showKanji ? (
+                      GetFurigana(currentFlashCardData.japaneseText)
+                    ) : (
+                      TextHelpers.GetTextAsKana(
+                        currentFlashCardData.japaneseText
                       )
-                    ) : (
-                      <MissingCardText cardId={currentTestStep.cardId} />
-                    )}
-                  </h2>
-                </div>
+                    )
+                  ) : (
+                    <MissingCardText cardId={currentTestStep.cardId} />
+                  )}
+                </h2>
               </div>
-              <div className={"absolute transform-3d w-full h-full"}>
-                <div
-                  className={
-                    "transform-3d w-full h-full flex flex-col justify-center items-center"
-                  }
-                >
-                  <h2 className={"rotate-y-180 backface-hidden"}>
-                    {currentFlashCardData ? (
-                      currentFlashCardData.meaning
-                    ) : (
-                      <MissingCardText cardId={currentTestStep.cardId} />
-                    )}
-                  </h2>
-                </div>
+
+              <div className="flip-card-side flip-card-back">
+                <h2>
+                  {currentFlashCardData ? (
+                    currentFlashCardData.meaning
+                  ) : (
+                    <MissingCardText cardId={currentTestStep.cardId} />
+                  )}
+                </h2>
               </div>
             </div>
           </div>
