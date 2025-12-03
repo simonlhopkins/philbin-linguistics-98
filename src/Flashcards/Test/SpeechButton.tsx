@@ -48,7 +48,9 @@ export default function SpeechButton({
 
   useEffect(() => {
     const updateDevices = () => {
-      console.log("device change...");
+      if (!navigator.mediaDevices) {
+        return;
+      }
       navigator.mediaDevices
         .enumerateDevices()
         .then((devices) => {
@@ -75,7 +77,10 @@ export default function SpeechButton({
     updateDevices();
 
     // Listen for device or permission changes
-    navigator.mediaDevices.addEventListener("devicechange", updateDevices);
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.addEventListener("devicechange", updateDevices);
+    }
+    
 
     try {
       navigator.permissions.query({ name: "microphone" }).then((permission) => {
@@ -93,7 +98,15 @@ export default function SpeechButton({
     }
 
     return () =>
-      navigator.mediaDevices.removeEventListener("devicechange", updateDevices);
+    {
+      if (navigator.mediaDevices) {
+        navigator.mediaDevices.removeEventListener(
+          "devicechange",
+          updateDevices
+        );
+      }
+    }
+      
   }, []);
   return (
     <fieldset className="border-2">
