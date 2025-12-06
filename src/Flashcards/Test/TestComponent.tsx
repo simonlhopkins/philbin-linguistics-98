@@ -48,10 +48,10 @@ export default function TestComponent({ currentTestData }: Props) {
   const cardIdBeforeClickRef = useRef<number | null>(null);
   //when the selection changes reset your current test
   useEffect(() => {
-    dispatch(flashcardSlice.actions.SetCardAsSeen(currentTestStep.cardId));
+    //code smell, this needs to go first or else SetCardAsSeen triggers re render.
     cardIdBeforeClickRef.current = currentTestStep.cardId;
+    dispatch(flashcardSlice.actions.SetCardAsSeen(currentTestStep.cardId));
   }, [currentTestData.currentStep]);
-
   return (
     <div className={"flex flex-col gap-2"}>
       <div className="flex flex-row gap-2 flex-wrap max-w-full">

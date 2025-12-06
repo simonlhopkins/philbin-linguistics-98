@@ -124,7 +124,6 @@ export const flashcardSlice = createSlice({
           state.currentTestData.currentStep + 1,
           state.currentTestData.testSteps.length - 1
         );
-        console.log(state.currentTestData.testSteps[newStep].cardId);
         state.currentTestData = {
           ...state.currentTestData,
           currentStep: newStep,

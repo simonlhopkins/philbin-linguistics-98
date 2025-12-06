@@ -18,22 +18,17 @@ class OpenAIClient {
 
   static async TranscribeAudioBlob(
     audioBlob: Blob
-  ): Promise<OpenAI.Audio.Transcriptions.Transcription | null> {
-    try {
-      const mimeType = audioBlob.type || "application/octet-stream";
-      console.log(mimeType);
-      const transcription = await this.client.audio.transcriptions.create({
-        file: new File([audioBlob], "audio." + mimeType.split("/")[1], {
-          type: mimeType,
-        }),
-        model: "gpt-4o-transcribe",
-        language: "ja",
-      });
-      return transcription;
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+  ): Promise<OpenAI.Audio.Transcriptions.Transcription> {
+    const mimeType = audioBlob.type || "application/octet-stream";
+    console.log(mimeType);
+    const transcription = await this.client.audio.transcriptions.create({
+      file: new File([audioBlob], "audio." + mimeType.split("/")[1], {
+        type: mimeType,
+      }),
+      model: "gpt-4o-transcribe",
+      language: "ja",
+    });
+    return transcription;
   }
 
   static async FetchAudioBlob(text: string): Promise<Blob | null> {

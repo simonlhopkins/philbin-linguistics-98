@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import OpenAIClient from "./OpenAIClient";
+import { toast } from "sonner";
+import ErrorToast from "../../Toasts/ErrorToast";
 
 interface Props {
   onTranscription(transcription: string): void;
@@ -80,7 +82,6 @@ export default function SpeechButton({
     if (navigator.mediaDevices) {
       navigator.mediaDevices.addEventListener("devicechange", updateDevices);
     }
-    
 
     try {
       navigator.permissions.query({ name: "microphone" }).then((permission) => {
@@ -97,16 +98,14 @@ export default function SpeechButton({
       // Handle the error
     }
 
-    return () =>
-    {
+    return () => {
       if (navigator.mediaDevices) {
         navigator.mediaDevices.removeEventListener(
           "devicechange",
           updateDevices
         );
       }
-    }
-      
+    };
   }, []);
   return (
     <fieldset className="border-2">
@@ -182,16 +181,24 @@ export default function SpeechButton({
             mediaRecorder.current.onstop = async () => {
               cancelAnimationFrame(rafIdRef.current!);
               audioContextRef.current?.close();
-              const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
               setIsRecording(false);
               setIsLoading(true);
               setVolume(0);
-              const response = await OpenAIClient.TranscribeAudioBlob(
-                audioBlob
-              );
-              if (response) {
+              try {
+                const recordingMimeType = audioChunks[0].type.split(";")[0];
+                const audioBlob = new Blob(audioChunks, {
+                  type: recordingMimeType,
+                });
+                const response = await OpenAIClient.TranscribeAudioBlob(
+                  audioBlob
+                );
                 onTranscription(response.text);
+              } catch (e: any) {
+                toast.custom((id) => (
+                  <ErrorToast errorString={e.message} id={id} />
+                ));
               }
+
               setIsLoading(false);
             };
           }}
