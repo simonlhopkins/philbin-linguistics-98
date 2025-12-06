@@ -78,7 +78,7 @@ export default function TestResults({ currentTestData }: Props) {
                 dispatch(flashcardSlice.actions.ExitTest());
               }}
             >
-              Exit
+              Submit and Exit
             </button>
           </div>
         </div>

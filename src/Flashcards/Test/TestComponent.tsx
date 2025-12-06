@@ -13,6 +13,7 @@ import TextHelpers from "../../TextHelpers.ts";
 import MissingCardText from "./MissingCardText.tsx";
 import SpeechButton from "./SpeechButton.tsx";
 import VocalizeButton from "./VocalizeButton.tsx";
+import CopyToast from "../../Toasts/CopyToast.tsx";
 
 interface Props {
   currentTestData: TestData;
@@ -168,6 +169,9 @@ export default function TestComponent({ currentTestData }: Props) {
                 </button>
               ) : (
                 <button
+                  disabled={
+                    currentTestStep.responseStatus == ResponseStatus.UNKNOWN
+                  }
                   onClick={() => {
                     dispatch(flashcardSlice.actions.NextQuestion());
                   }}
@@ -180,10 +184,12 @@ export default function TestComponent({ currentTestData }: Props) {
         </div>
         <div className="flex flex-col gap-3">
           <button
+            className="flex gap-2 items-center"
             onClick={() => {
               dispatch(flashcardSlice.actions.AbandonTest());
             }}
           >
+            <img src="/recycle_bin_full-2.png" alt="" className="my-2 h-6" />
             Abandon Test
           </button>
           <SpeechButton
@@ -210,26 +216,10 @@ export default function TestComponent({ currentTestData }: Props) {
               }
               toast.custom(
                 (id) => (
-                  <div className="window w-64">
-                    <div className="title-bar">
-                      <div className="title-bar-text">Message</div>
-                      <div className="title-bar-controls">
-                        <button
-                          onClick={() => {
-                            toast.dismiss(id);
-                          }}
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                    </div>
-                    <div className="window-body">
-                      <p>
-                        {`${TextHelpers.GetTextAsKanji(
-                          currentFlashCardData!.japaneseText
-                        )} Copied to clipboard`}
-                      </p>
-                    </div>
-                  </div>
+                  <CopyToast
+                    japaneseText={currentFlashCardData!.japaneseText}
+                    id={id}
+                  />
                 ),
                 {
                   closeButton: true,

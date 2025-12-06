@@ -8,12 +8,23 @@ interface MyDB extends DBSchema {
       type: string;
     };
   };
+  stats: {
+    key: string;
+    value: number | string;
+  };
 }
 export default class IndexedDBClient {
   private static async OpenAudioDatabase() {
-    return openDB<MyDB>("audio-store", 1, {
+    return openDB<MyDB>("philbin-linguistics-store", 1, {
       upgrade(db) {
         db.createObjectStore("audio");
+      },
+    });
+  }
+  private static async OpenStatsDatabase() {
+    return openDB<MyDB>("philbin-linguistics-store", 1, {
+      upgrade(db) {
+        db.createObjectStore("stats");
       },
     });
   }
@@ -36,5 +47,10 @@ export default class IndexedDBClient {
     };
 
     return (await dbPromise).put("audio", data, key);
+  }
+
+  static async DeleteAudioBlob(key: string) {
+    const dbPromise = IndexedDBClient.OpenAudioDatabase();
+    return (await dbPromise).delete("audio", key);
   }
 }

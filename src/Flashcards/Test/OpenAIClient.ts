@@ -20,8 +20,12 @@ class OpenAIClient {
     audioBlob: Blob
   ): Promise<OpenAI.Audio.Transcriptions.Transcription | null> {
     try {
+      const mimeType = audioBlob.type || "application/octet-stream";
+      console.log(mimeType);
       const transcription = await this.client.audio.transcriptions.create({
-        file: new File([audioBlob], "audio.m4a", { type: "audio/mp4" }),
+        file: new File([audioBlob], "audio." + mimeType.split("/")[1], {
+          type: mimeType,
+        }),
         model: "gpt-4o-transcribe",
         language: "ja",
       });
@@ -40,9 +44,11 @@ class OpenAIClient {
         response_format: "mp3",
         input: text,
       });
-
+      const mimeType =
+        response.headers.get("content-type") ?? "application/octet-stream";
+      console.log(mimeType);
       const arrayBuffer = await response.arrayBuffer();
-      return new Blob([arrayBuffer], { type: "audio/mpeg" });
+      return new Blob([arrayBuffer], { type: mimeType });
     } catch (e) {
       console.error("[FetchAudioBlob]", e);
       return null;
