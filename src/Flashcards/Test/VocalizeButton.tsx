@@ -37,6 +37,7 @@ export default function VocalizeButton({ japaneseText }: Props) {
       </button>
       <button
         className="!min-w-0"
+        disabled={loading}
         onClick={async () => {
           setLoading(true);
           const text = TextHelpers.GetTextAsKana(japaneseText);

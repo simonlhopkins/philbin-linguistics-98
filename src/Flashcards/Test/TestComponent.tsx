@@ -3,10 +3,12 @@ import clsx from "clsx";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
+  CardFlipAnimation,
   Face,
   flashcardSlice,
   ResponseStatus,
   type TestData,
+  type TestStep,
 } from "../../Redux/flashcardSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../Redux/hooks.ts";
 import TextHelpers from "../../TextHelpers.ts";
@@ -14,6 +16,8 @@ import MissingCardText from "./MissingCardText.tsx";
 import SpeechButton from "./SpeechButton.tsx";
 import VocalizeButton from "./VocalizeButton.tsx";
 import CopyToast from "../../Toasts/CopyToast.tsx";
+import GoodJobToast from "../../Toasts/GoodJobToast.tsx";
+import IncorrectToast from "../../Toasts/IncorrectToast.tsx";
 
 interface Props {
   currentTestData: TestData;
@@ -45,13 +49,31 @@ export default function TestComponent({ currentTestData }: Props) {
     (currentTestData.currentStep + 1) / currentTestData.testSteps.length;
 
   //helper for whether to animate or not
-  const cardIdBeforeClickRef = useRef<number | null>(null);
   //when the selection changes reset your current test
   useEffect(() => {
-    //code smell, this needs to go first or else SetCardAsSeen triggers re render.
-    cardIdBeforeClickRef.current = currentTestStep.cardId;
     dispatch(flashcardSlice.actions.SetCardAsSeen(currentTestStep.cardId));
   }, [currentTestData.currentStep]);
+
+  console.log(currentTestStep.faceData.animation);
+
+  function getTextColor(responseStatus: ResponseStatus) {
+    switch (responseStatus) {
+      case ResponseStatus.CORRECT:
+        return "text-green-600";
+      case ResponseStatus.INCORRECT:
+        return "text-red-500";
+      default:
+        return "text-black";
+    }
+  }
+
+  function getFlashcardRotation(testStep: TestStep, testData: TestData) {
+    let shouldRotate = testStep.faceData.face == Face.JAPANESE_TEXT;
+    return (Number(shouldRotate) ^ Number(testData.invertFaces)) == 0
+      ? ""
+      : "rotate-y-180";
+  }
+
   return (
     <div className={"flex flex-col gap-2"}>
       <div className="flex flex-row gap-2 flex-wrap max-w-full">
@@ -66,49 +88,35 @@ export default function TestComponent({ currentTestData }: Props) {
             }}
             className={clsx(
               "window transform-3d w-full aspect-video max-w-full perspective-midrange flex flex-col",
-              currentTestStep.faceShowing ==
-                (currentTestData.invertFaces
-                  ? Face.ENGLISH_TEXT
-                  : Face.JAPANESE_TEXT) && "rotate-y-180",
-              cardIdBeforeClickRef.current == currentTestStep.cardId &&
-                "transition-transform duration-500"
+              getFlashcardRotation(currentTestStep, currentTestData),
+              currentTestStep.faceData.animation == CardFlipAnimation.FLIP &&
+                "transition-transform duration-500",
+              getTextColor(currentTestStep.responseStatus)
             )}
           >
-            <div
-              className={clsx(
-                "window-body flex-1 flip-card",
-                currentTestStep.responseStatus == ResponseStatus.CORRECT &&
-                  "text-green-600",
-                currentTestStep.responseStatus == ResponseStatus.INCORRECT &&
-                  "text-red-500"
-              )}
-            >
-              {/* Front */}
-              <div className="flip-card-side flip-card-front">
-                <h2>
-                  {currentFlashCardData ? (
-                    currentTestData.showKanji ? (
-                      GetFurigana(currentFlashCardData.japaneseText)
-                    ) : (
-                      TextHelpers.GetTextAsKana(
-                        currentFlashCardData.japaneseText
-                      )
-                    )
+            {/* Front */}
+            <div className="flip-card-side flip-card-front">
+              <h2>
+                {currentFlashCardData ? (
+                  currentTestData.showKanji ? (
+                    GetFurigana(currentFlashCardData.japaneseText)
                   ) : (
-                    <MissingCardText cardId={currentTestStep.cardId} />
-                  )}
-                </h2>
-              </div>
-              {/* Back */}
-              <div className="flip-card-side flip-card-back">
-                <h2>
-                  {currentFlashCardData ? (
-                    currentFlashCardData.meaning
-                  ) : (
-                    <MissingCardText cardId={currentTestStep.cardId} />
-                  )}
-                </h2>
-              </div>
+                    TextHelpers.GetTextAsKana(currentFlashCardData.japaneseText)
+                  )
+                ) : (
+                  <MissingCardText cardId={currentTestStep.cardId} />
+                )}
+              </h2>
+            </div>
+            {/* Back */}
+            <div className="flip-card-side flip-card-back">
+              <h2>
+                {currentFlashCardData ? (
+                  currentFlashCardData.meaning
+                ) : (
+                  <MissingCardText cardId={currentTestStep.cardId} />
+                )}
+              </h2>
             </div>
           </div>
           <div className="w-full flex flex-row justify-between">
@@ -122,6 +130,7 @@ export default function TestComponent({ currentTestData }: Props) {
                     )
                   );
                   dispatch(flashcardSlice.actions.NextQuestion());
+                  toast.custom((id) => <GoodJobToast id={id} />);
                 }}
               >
                 <img
@@ -140,6 +149,7 @@ export default function TestComponent({ currentTestData }: Props) {
                     )
                   );
                   dispatch(flashcardSlice.actions.NextQuestion());
+                  toast.custom((id) => <IncorrectToast id={id} />);
                 }}
               >
                 <img

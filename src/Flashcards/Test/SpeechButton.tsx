@@ -219,9 +219,8 @@ export default function SpeechButton({
           Stop Recording Speech
         </button>
       </div>
-      <div className="field-row">
-        <span>Response: </span>
-        <span>{currentResponse || "None"}</span>
+      <div className="field-row border-dashed border-2 px-2">
+        <p className="text-lg">{`Response: ${currentResponse || "None"}`}</p>
       </div>
     </fieldset>
   );

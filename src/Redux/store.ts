@@ -11,15 +11,19 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import createMigrate from "redux-persist/es/createMigrate";
 
 const rootReducer = combineReducers({
   flashcard: flashcardReducer,
 });
-
+const migrations = {
+  2: () => undefined, // wipes *all* persisted state
+};
 const persistConfig = {
   key: "root",
-  version: 1,
+  version: 2,
   storage,
+  migrate: createMigrate(migrations),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

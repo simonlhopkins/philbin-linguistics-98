@@ -89,7 +89,10 @@ export const flashcardSlice = createSlice({
           spokenAnswer: null,
           writtenAnswer: null,
           alreadySeen: false,
-          faceShowing: Face.JAPANESE_TEXT,
+          faceData: {
+            face: Face.JAPANESE_TEXT,
+            animation: CardFlipAnimation.NONE,
+          },
           responseStatus: ResponseStatus.UNKNOWN,
         }));
 
@@ -104,6 +107,7 @@ export const flashcardSlice = createSlice({
 
     SetCardAsSeen: (state, action: PayloadAction<number>) => {
       const seenCardId = action.payload;
+      console.log("set card as seen");
       if (state.currentTestData) {
         state.currentTestData = {
           ...state.currentTestData,
@@ -131,10 +135,13 @@ export const flashcardSlice = createSlice({
             i == newStep
               ? {
                   ...step,
-                  faceShowing:
-                    newStep == state.currentTestData!.testSteps.length - 1
-                      ? step.faceShowing
-                      : Face.JAPANESE_TEXT,
+                  faceData: {
+                    face:
+                      newStep == state.currentTestData!.testSteps.length - 1
+                        ? step.faceData.face
+                        : Face.JAPANESE_TEXT,
+                    animation: CardFlipAnimation.NONE,
+                  },
                 }
               : step
           ),
@@ -152,7 +159,10 @@ export const flashcardSlice = createSlice({
             i == newStep
               ? {
                   ...step,
-                  faceShowing: Face.JAPANESE_TEXT,
+                  faceData: {
+                    face: Face.JAPANESE_TEXT,
+                    animation: CardFlipAnimation.NONE,
+                  },
                 }
               : step
           ),
@@ -168,7 +178,10 @@ export const flashcardSlice = createSlice({
             step.cardId == flipCardId
               ? {
                   ...step,
-                  faceShowing: step.faceShowing ^ 1,
+                  faceData: {
+                    face: step.faceData.face ^ 1,
+                    animation: CardFlipAnimation.FLIP,
+                  },
                 }
               : step
           ),
@@ -297,6 +310,17 @@ export const flashcardSlice = createSlice({
         state.currentTestData = {
           ...state.currentTestData,
           invertFaces: action.payload,
+          testSteps: state.currentTestData.testSteps.map((step, i) =>
+            i == state.currentTestData?.currentStep
+              ? {
+                  ...step,
+                  faceData: {
+                    ...step.faceData,
+                    animation: CardFlipAnimation.FLIP,
+                  },
+                }
+              : step
+          ),
         };
       }
     },
@@ -316,7 +340,7 @@ export interface TestStep {
   spokenAnswer: null | string;
   writtenAnswer: null | string;
   alreadySeen: boolean;
-  faceShowing: Face;
+  faceData: FaceData;
   responseStatus: ResponseStatus;
 }
 
@@ -341,6 +365,14 @@ export enum ResponseStatus {
 export enum Face {
   JAPANESE_TEXT = 0,
   ENGLISH_TEXT = 1,
+}
+export enum CardFlipAnimation {
+  NONE,
+  FLIP,
+}
+export interface FaceData {
+  face: Face;
+  animation: CardFlipAnimation;
 }
 
 export default flashcardSlice.reducer;
