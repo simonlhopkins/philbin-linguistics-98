@@ -54,8 +54,6 @@ export default function TestComponent({ currentTestData }: Props) {
     dispatch(flashcardSlice.actions.SetCardAsSeen(currentTestStep.cardId));
   }, [currentTestData.currentStep]);
 
-  console.log(currentTestStep.faceData.animation);
-
   function getTextColor(responseStatus: ResponseStatus) {
     switch (responseStatus) {
       case ResponseStatus.CORRECT:
@@ -66,9 +64,8 @@ export default function TestComponent({ currentTestData }: Props) {
         return "text-black";
     }
   }
-
   function getFlashcardRotation(testStep: TestStep, testData: TestData) {
-    let shouldRotate = testStep.faceData.face == Face.JAPANESE_TEXT;
+    let shouldRotate = testStep.faceData.face == Face.ENGLISH_TEXT;
     return (Number(shouldRotate) ^ Number(testData.invertFaces)) == 0
       ? ""
       : "rotate-y-180";
@@ -95,7 +92,7 @@ export default function TestComponent({ currentTestData }: Props) {
             )}
           >
             {/* Front */}
-            <div className="flip-card-side flip-card-front">
+            <div className="flip-card-side rotate-y-0">
               <h2>
                 {currentFlashCardData ? (
                   currentTestData.showKanji ? (
@@ -109,7 +106,7 @@ export default function TestComponent({ currentTestData }: Props) {
               </h2>
             </div>
             {/* Back */}
-            <div className="flip-card-side flip-card-back">
+            <div className="flip-card-side rotate-y-180">
               <h2>
                 {currentFlashCardData ? (
                   currentFlashCardData.meaning
@@ -175,7 +172,7 @@ export default function TestComponent({ currentTestData }: Props) {
                     dispatch(flashcardSlice.actions.FinishTest());
                   }}
                 >
-                  FINISH
+                  <b>FINISH</b>
                 </button>
               ) : (
                 <button
@@ -193,15 +190,6 @@ export default function TestComponent({ currentTestData }: Props) {
           </div>
         </div>
         <div className="flex flex-col gap-3">
-          <button
-            className="flex gap-2 items-center"
-            onClick={() => {
-              dispatch(flashcardSlice.actions.AbandonTest());
-            }}
-          >
-            <img src="/recycle_bin_full-2.png" alt="" className="my-2 h-6" />
-            Abandon Test
-          </button>
           <SpeechButton
             onTranscription={function (transcription: string): void {
               dispatch(
@@ -263,6 +251,15 @@ export default function TestComponent({ currentTestData }: Props) {
             />
             <label htmlFor="showKanji">Show Kanji</label>
           </div>
+          <button
+            className="flex gap-2 items-center"
+            onClick={() => {
+              dispatch(flashcardSlice.actions.AbandonTest());
+            }}
+          >
+            <img src="/recycle_bin_full-2.png" alt="" className="my-2 h-6" />
+            Abandon Test
+          </button>
         </div>
       </div>
 

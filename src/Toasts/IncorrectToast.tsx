@@ -5,20 +5,22 @@ interface Props {
 }
 export default function IncorrectToast({ id }: Props) {
   return (
-    <div className="window w-64">
-      <div className="title-bar">
-        <div className="title-bar-text">Message</div>
-        <div className="title-bar-controls">
-          <button
-            onClick={() => {
-              toast.dismiss(id);
-            }}
-            aria-label="Close"
-          ></button>
+    <div className="shadow-xl/30">
+      <div className="window w-64">
+        <div className="title-bar">
+          <div className="title-bar-text">Message</div>
+          <div className="title-bar-controls">
+            <button
+              onClick={() => {
+                toast.dismiss(id);
+              }}
+              aria-label="Close"
+            ></button>
+          </div>
         </div>
-      </div>
-      <div className="window-body flex gap-2 items-center justify-center">
-        <img src="/misato_slam_beer_down.gif" alt="" className="max-w-md" />
+        <div className="window-body flex gap-2 items-center justify-center">
+          <img src="/misato_slam_beer_down.gif" alt="" className="max-w-md" />
+        </div>
       </div>
     </div>
   );

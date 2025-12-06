@@ -12,11 +12,6 @@
 li[role="tab"] {
   background-color: rgb(192, 192, 192);
 }
-
-.dolphinsBackground {
-  background-image: url("/dolphins.gif");
-}
-
 /* Container that holds both card sides */
 .flip-card {
   perspective: 1000px;
@@ -36,16 +31,4 @@ li[role="tab"] {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* Front */
-.flip-card-front {
-  transform: rotateY(0deg);
-  -webkit-transform: rotateY(0deg);
-}
-
-/* Back */
-.flip-card-back {
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
 }

@@ -116,15 +116,9 @@ export default function Study({ onRefreshClicked }: Props) {
                 key={row.id}
                 className={clsx(
                   new Set(selectedCards).has(row.id) && "highlighted",
-                  "select-none"
+                  "select-none",
+                  "h-10 md:h-auto"
                 )}
-                // onClick={()=>{
-                //     if(selectedItems.has(row.id)){
-                //         setSelectedItems(SetHelpers.difference(selectedItems, new Set([row.id])))
-                //     }else{
-                //         setSelectedItems(SetHelpers.union(selectedItems, new Set([row.id])))
-                //     }
-                // }}
                 onMouseDown={() => {
                   setIsDragging(true);
                   if (new Set(selectedCards).has(row.id)) {

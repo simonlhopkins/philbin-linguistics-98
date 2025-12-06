@@ -110,19 +110,23 @@ export default function SpeechButton({
   return (
     <fieldset className="border-2">
       <legend>Record Answer {volumeToAscii(volume * 10)}</legend>
-      <select
-        className="mb-2"
-        value={selectedMediaDeviceId || "default"}
-        onChange={(e) => {
-          setSelectedMediaDeviceId(e.target.value);
-        }}
-      >
-        {currentMediaDeviceInfo.map((mediaDevice) => (
-          <option value={mediaDevice.deviceId} key={mediaDevice.deviceId}>
-            {mediaDevice.label}
-          </option>
-        ))}
-      </select>
+      {recordingPermission != "granted" ? (
+        <></>
+      ) : (
+        <select
+          className="mb-2"
+          value={selectedMediaDeviceId || "default"}
+          onChange={(e) => {
+            setSelectedMediaDeviceId(e.target.value);
+          }}
+        >
+          {currentMediaDeviceInfo.map((mediaDevice) => (
+            <option value={mediaDevice.deviceId} key={mediaDevice.deviceId}>
+              {mediaDevice.label}
+            </option>
+          ))}
+        </select>
+      )}
 
       <div className="field-row">
         <button

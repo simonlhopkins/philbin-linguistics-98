@@ -38,6 +38,7 @@ export default function VocalizeButton({ japaneseText }: Props) {
       <button
         className="!min-w-0"
         disabled={loading}
+        title="Delete cached recording"
         onClick={async () => {
           setLoading(true);
           const text = TextHelpers.GetTextAsKana(japaneseText);
