@@ -20,7 +20,11 @@ export default function ErrorToast({ errorString, id }: Props) {
           </div>
         </div>
         <div className="window-body flex gap-2">
-          <img src="/msg_warning-0.png" alt="" className="w-6 h-auto" />
+          <img
+            src="/msg_warning-0.png"
+            alt=""
+            className="h-6 aspect-square self-center"
+          />
           <p>{`Error: ${errorString}`}</p>
         </div>
       </div>

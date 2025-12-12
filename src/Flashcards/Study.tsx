@@ -61,91 +61,105 @@ export default function Study({ onRefreshClicked }: Props) {
   }
 
   return (
-    <div className={"flex gap-2 flex-wrap"}>
-      <div className="sunken-panel inline-block h-96 max-w-xl">
-        <table className={clsx("interactive")}>
-          <thead>
-            <tr>
-              <th className="!p-0">
-                <button
-                  className={"w-full text-left"}
-                  onClick={() =>
-                    setSortDirectionAndMaybeChangeDirection(SortMethod.PHRASE)
-                  }
-                >
-                  Phrase
-                </button>
-              </th>
-              <th className="!p-0">
-                <button
-                  className={"w-full text-left"}
-                  onClick={() =>
-                    setSortDirectionAndMaybeChangeDirection(SortMethod.MEANING)
-                  }
-                >
-                  Meaning
-                </button>
-              </th>
-              <th className="!p-0">
-                <button
-                  className={"w-full text-left"}
-                  onClick={() =>
-                    setSortDirectionAndMaybeChangeDirection(SortMethod.Flavor)
-                  }
-                >
-                  Flavor Text
-                </button>
-              </th>
-              <th className="!p-0">
-                <button
-                  className={"w-full text-left"}
-                  onClick={() =>
-                    setSortDirectionAndMaybeChangeDirection(
-                      SortMethod.DATE_LEARNED
-                    )
-                  }
-                >
-                  Date Learned
-                </button>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedFlashCards.map((row, index) => (
-              <tr
-                key={row.id}
-                className={clsx(
-                  new Set(selectedCards).has(row.id) && "highlighted",
-                  "select-none",
-                  "h-10 md:h-auto"
-                )}
-                onMouseDown={() => {
-                  setIsDragging(true);
-                  if (new Set(selectedCards).has(row.id)) {
-                    dispatch(
-                      flashcardSlice.actions.RemoveCardFromSelection(row.id)
-                    );
-                  } else {
-                    dispatch(flashcardSlice.actions.AddCardToSelection(row.id));
-                  }
-                }}
-                onMouseEnter={() => {
-                  if (!isDragging) return;
-
-                  dispatch(flashcardSlice.actions.AddCardToSelection(row.id));
-                }}
-                onMouseUp={() => setIsDragging(false)}
-              >
-                <td>{row.japaneseText}</td>
-                <td>{row.meaning}</td>
-                <td>{row.flavorText}</td>
-                <td>{new Date(row.dateLearned).toLocaleDateString()}</td>
+    <div className={"grid grid-cols-1 md:grid-cols-8 max-w-full gap-2"}>
+      <div className="col-span-1 md:col-span-6 overflow-hidden">
+        {/* <div className="field-row">
+          <label htmlFor="googleSheetsIdInput">Google Sheets ID:</label>
+          <input id="googleSheetsIdInput" type="text" />
+        </div> */}
+        <div className="sunken-panel h-96 overflow-scroll max-w-full">
+          <table className={clsx("interactive")}>
+            <thead>
+              <tr>
+                <th className="!p-0">
+                  <button
+                    className={"w-full text-left"}
+                    onClick={() =>
+                      setSortDirectionAndMaybeChangeDirection(SortMethod.PHRASE)
+                    }
+                  >
+                    Phrase
+                  </button>
+                </th>
+                <th className="!p-0">
+                  <button
+                    className={"w-full text-left"}
+                    onClick={() =>
+                      setSortDirectionAndMaybeChangeDirection(
+                        SortMethod.MEANING
+                      )
+                    }
+                  >
+                    Meaning
+                  </button>
+                </th>
+                <th className="!p-0">
+                  <button
+                    className={"w-full text-left"}
+                    onClick={() =>
+                      setSortDirectionAndMaybeChangeDirection(SortMethod.Flavor)
+                    }
+                  >
+                    Flavor Text
+                  </button>
+                </th>
+                <th className="!p-0">
+                  <button
+                    className={"w-full text-left"}
+                    onClick={() =>
+                      setSortDirectionAndMaybeChangeDirection(
+                        SortMethod.DATE_LEARNED
+                      )
+                    }
+                  >
+                    Date Learned
+                  </button>
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {sortedFlashCards.map((row, index) => (
+                <tr
+                  key={row.id}
+                  className={clsx(
+                    new Set(selectedCards).has(row.id) && "highlighted",
+                    "select-none",
+                    "h-10 md:h-auto"
+                  )}
+                  onMouseDown={() => {
+                    setIsDragging(true);
+                    if (new Set(selectedCards).has(row.id)) {
+                      dispatch(
+                        flashcardSlice.actions.RemoveCardFromSelection(row.id)
+                      );
+                    } else {
+                      dispatch(
+                        flashcardSlice.actions.AddCardToSelection(row.id)
+                      );
+                    }
+                  }}
+                  onMouseEnter={() => {
+                    if (!isDragging) return;
+
+                    dispatch(flashcardSlice.actions.AddCardToSelection(row.id));
+                  }}
+                  onMouseUp={() => setIsDragging(false)}
+                >
+                  <td>{row.japaneseText}</td>
+                  <td>{row.meaning}</td>
+                  <td>{row.flavorText}</td>
+                  <td>{new Date(row.dateLearned).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div className={"grid grid-cols-1 grid-rows-6 gap-3"}>
+      <div
+        className={
+          "col-span-1 md:col-span-2 grid grid-cols-1 grid-rows-6 gap-3"
+        }
+      >
         <button
           onClick={() => {
             dispatch(flashcardSlice.actions.SelectAll());

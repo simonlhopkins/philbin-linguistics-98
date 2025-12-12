@@ -1,28 +1,33 @@
 import PublicGoogleSheetsParser from "public-google-sheets-parser";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { flashcardSlice, TestStatus } from "../Redux/flashcardSlice.ts";
 import { useAppDispatch, useAppSelector } from "../Redux/hooks.ts";
 import Study from "./Study.tsx";
 import TestComponent from "./Test/TestComponent.tsx";
 import TestResults from "./TestResults.tsx";
+import { toast } from "sonner";
+import ErrorToast from "../Toasts/ErrorToast.tsx";
 
 export default function Flashcards() {
   // const [selectedMode, setSelectedMode] = useState<MODE>(MODE.STUDY);
 
   const { currentTestData } = useAppSelector((state) => state.flashcard);
   const dispatch = useAppDispatch();
+  const statupRefresh = useRef(false);
 
   useEffect(() => {
-    RefreshItems();
+    if (!statupRefresh.current) {
+      RefreshItems();
+    }
+    statupRefresh.current = true;
   }, []);
   function RefreshItems() {
+    const spreadsheetId = "1Sqog1gAuZK7Ca4dDxveq8DH6DdeD2ELoexJGjacI_nk";
     const options = { useFormat: true };
-    const parser = new PublicGoogleSheetsParser(
-      "1Sqog1gAuZK7Ca4dDxveq8DH6DdeD2ELoexJGjacI_nk",
-      options
-    );
+    const parser = new PublicGoogleSheetsParser(spreadsheetId, options);
 
     parser.parse().then((data: GoogleSheetRow[]) => {
+      console.log(data);
       const flashcardData = data
         .filter((row) => row["japanese text"] != undefined)
         .map(
@@ -36,7 +41,16 @@ export default function Flashcards() {
             } as FlashCardData)
         )
         .sort((a, b) => a.id - b.id);
-      dispatch(flashcardSlice.actions.SetLoadedCards(flashcardData));
+      if (flashcardData.length > 0) {
+        dispatch(flashcardSlice.actions.SetLoadedCards(flashcardData));
+      } else {
+        toast.custom((id) => (
+          <ErrorToast
+            errorString={`speadsheet with id: ${spreadsheetId} not found`}
+            id={id}
+          />
+        ));
+      }
     });
   }
 
